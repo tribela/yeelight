@@ -27,7 +27,7 @@ def scanble(hci="hci0", timeout=1):
 
     return lines
 
-class BLEDevice:
+class BLEDevice(object):
     def __init__(self, addr=None):
         self.services = {}
         self.characteristics = {}
