@@ -56,9 +56,8 @@ class BLEDevice:
             try:
                 self.gatt.expect(ch_pat, timeout=2)
                 ch_tuple = self.gatt.match.groups()
-                uuid = ch_tuple[3][4:8]
+                uuid = ch_tuple[3][:8]
                 self.characteristics[uuid]=ch_tuple
-                #print ch_tuple
             except pexpect.TIMEOUT:
                 break
         print "got all characteristics."

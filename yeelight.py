@@ -53,7 +53,7 @@ class ConnectPanel(Frame):
         global bulb
         bulb = BLEDevice(self.bl.get())
         time.sleep(0.1)
-        bulb.writereq(bulb.getvaluehandle(WRITE_CHAR_UUID), COMMAND_STX+AUTH_CMD+AUTH_ON+COMMAND_ETX*15)
+        bulb.writecmd(bulb.getvaluehandle(WRITE_CHAR_UUID), COMMAND_STX+AUTH_CMD+AUTH_ON+COMMAND_ETX*15)
 
 class PowerPanel(Frame):
     def __init__(self, app):
