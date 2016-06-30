@@ -1,3 +1,4 @@
+import os
 import time
 
 from flask import Flask, render_template, request
@@ -5,7 +6,7 @@ from flask import Flask, render_template, request
 from yeelight import Yeelight
 
 app = Flask(__name__, template_folder='.')
-YEELIGHT_ADDRESS = os.environ('YEELIGHT_ADDRESS')
+YEELIGHT_ADDRESS = os.environ['YEELIGHT_ADDRESS']
 yeelight = Yeelight(YEELIGHT_ADDRESS)
 
 
