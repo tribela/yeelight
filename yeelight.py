@@ -27,6 +27,8 @@ class Yeelight(BLEDevice):
 
     COLORFLOW_CMD = "4a"
 
+    SLEEP_CMD = "7f03"
+
     def __init__(self, address):
         self.__address = address
         super(Yeelight, self).__init__(address)
@@ -76,3 +78,11 @@ class Yeelight(BLEDevice):
             ('%04x' % (1700 + value * 4800)) +
             self.TEMP_MODE +
             self.COMMAND_ETX * 13)
+
+    def setsleep(self, minute):
+        self.__write_cmd(
+            self.COMMAND_STX +
+            self.SLEEP_CMD +
+            ('%02x' % minute) +
+            self.COMMAND_ETX * 14
+        )
