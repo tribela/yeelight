@@ -1,11 +1,9 @@
-from Tkinter import *
-from tkColorChooser import askcolor
-import colorsys
-import math, sys, time
-from bledevice import scanble, BLEDevice
+import binascii
+from bluepy.btle import Peripheral
 
-class Yeelight(BLEDevice):
-    WRITE_CHAR_UUID = "aa7d3f34" #-2d4f-41e0-807f-52fbf8cf7443"
+
+class Yeelight(object):
+    WRITE_CHAR_UUID = "aa7d3f34"  # -2d4f-41e0-807f-52fbf8cf7443"
 
     COMMAND_STX = "43"
     COMMAND_ETX = "00"
@@ -31,7 +29,12 @@ class Yeelight(BLEDevice):
 
     def __init__(self, address):
         self.__address = address
-        super(Yeelight, self).__init__(address)
+
+        self.__peripheral = Peripheral(address)
+        characteristics = self.__peripheral.getCharacteristics()
+        self.__ch = filter(lambda x: binascii.b2a_hex(x.uuid.binVal)
+                           .startswith(self.WRITE_CHAR_UUID),
+                           characteristics)[0]
 
         self.__write_cmd(
             self.COMMAND_STX +
@@ -40,20 +43,20 @@ class Yeelight(BLEDevice):
             self.COMMAND_ETX * 15)
 
     def __write_cmd(self, value):
-        self.writecmd(self.getvaluehandle(self.WRITE_CHAR_UUID), value)
+        self.__ch.write(binascii.a2b_hex(value))
 
     def poweron(self):
         self.__write_cmd(
-            self.COMMAND_STX + 
-            self.POWER_CMD + 
-            self.POWER_ON + 
+            self.COMMAND_STX +
+            self.POWER_CMD +
+            self.POWER_ON +
             self.COMMAND_ETX * 15)
 
     def poweroff(self):
         self.__write_cmd(
-            self.COMMAND_STX + 
-            self.POWER_CMD + 
-            self.POWER_OFF + 
+            self.COMMAND_STX +
+            self.POWER_CMD +
+            self.POWER_OFF +
             self.COMMAND_ETX * 15)
 
     def setrgb(self, rgb):
@@ -68,7 +71,7 @@ class Yeelight(BLEDevice):
         self.__write_cmd(
             self.COMMAND_STX +
             self.BRIGHT_CMD +
-            ('%02x' % value) + 
+            ('%02x' % value) +
             self.COMMAND_ETX * 15)
 
     def setwarm(self, value):
