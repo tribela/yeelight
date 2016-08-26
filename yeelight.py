@@ -1,5 +1,5 @@
 import binascii
-from bluepy.btle import Peripheral
+from bluepy.btle import BTLEException, Peripheral
 
 
 class Yeelight(object):
@@ -29,8 +29,11 @@ class Yeelight(object):
 
     def __init__(self, address):
         self.__address = address
+        self.__connect()
 
-        self.__peripheral = Peripheral(address)
+
+    def __connect(self):
+        self.__peripheral = Peripheral(self.__address)
         characteristics = self.__peripheral.getCharacteristics()
         self.__ch = filter(lambda x: binascii.b2a_hex(x.uuid.binVal)
                            .startswith(self.WRITE_CHAR_UUID),
@@ -43,7 +46,13 @@ class Yeelight(object):
             self.COMMAND_ETX * 15)
 
     def __write_cmd(self, value):
-        self.__ch.write(binascii.a2b_hex(value))
+        for _ in range(3):
+            try:
+                self.__ch.write(binascii.a2b_hex(value))
+            except BTLEException:
+                self.__connect()
+            else:
+                break
 
     def poweron(self):
         self.__write_cmd(
