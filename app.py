@@ -25,6 +25,7 @@ def switch():
     }
     if switch in command:
         command[switch]()
+        print('Turn {} the light'.format(switch))
         return 'OK'
 
     return 'Fail'
@@ -50,3 +51,11 @@ def light():
 
 
     return 'OK' if any((brightness, rgb, warm)) else 'FAIL'
+
+
+@app.route('/sleep', methods=['POST'])
+def sleep():
+    minutes = int(request.form.get('minutes'))
+    yeelight.setsleep(minutes)
+    print('Set sleep: {}'.format(minutes))
+    return 'OK'
