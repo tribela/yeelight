@@ -1,6 +1,8 @@
 import os
 import time
 
+import webcolors
+
 from flask import Flask, render_template, request
 
 from yeelight import Yeelight
@@ -35,16 +37,27 @@ def switch():
 def light():
     brightness = request.form.get('brightness')
     rgb = request.form.get('rgb')
+    color = request.form.get('color')
     warm = request.form.get('warm')
 
 
     if brightness:
         print('Set brightness: {}'.format(brightness))
         yeelight.setbrightness(int(brightness))
+        time.sleep(0.3)
 
     if rgb:
         print('Set rgb: {}'.format(rgb))
         yeelight.setrgb(rgb)
+    elif color:
+        color = color.replace(' ', '')
+        print('Set color {}'.format(color))
+        try:
+            rgb = webcolors.name_to_hex(color)[1:]
+        except ValueError as e:
+            return str(e)
+        else:
+            yeelight.setrgb(rgb)
     elif warm:
         print('Set warm: {}'.format(warm))
         yeelight.setwarm(float(warm))
