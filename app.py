@@ -38,16 +38,16 @@ def light():
     brightness = request.form.get('brightness')
     rgb = request.form.get('rgb')
     color = request.form.get('color')
-    warm = request.form.get('warm')
+    temp = request.form.get('temp')
 
 
     if brightness:
         print('Set brightness: {}'.format(brightness))
-        yeelight.setbrightness(int(brightness))
+        yeelight.set_brightness(int(brightness))
 
     if rgb:
         print('Set rgb: {}'.format(rgb))
-        yeelight.setrgb(rgb)
+        yeelight.set_rgb(rgb)
     elif color:
         color = color.replace(' ', '')
         print('Set color {}'.format(color))
@@ -56,18 +56,18 @@ def light():
         except ValueError as e:
             return str(e)
         else:
-            yeelight.setrgb(rgb)
-    elif warm:
-        print('Set warm: {}'.format(warm))
-        yeelight.setwarm(float(warm))
+            yeelight.set_rgb(rgb)
+    elif temp:
+        print('Set temp: {}'.format(temp))
+        yeelight.set_temp(float(temp))
 
 
-    return 'OK' if any((brightness, rgb, warm)) else 'FAIL'
+    return 'OK' if any((brightness, rgb, temp)) else 'FAIL'
 
 
 @app.route('/sleep', methods=['POST'])
 def sleep():
     minutes = int(request.form.get('minutes'))
-    yeelight.setsleep(minutes)
+    yeelight.set_sleep(minutes)
     print('Set sleep: {}'.format(minutes))
     return 'OK'
