@@ -57,7 +57,7 @@ class Yeelight(DefaultDelegate):
                 self._brightness = brightness
 
     def __connect(self):
-        self.__peripheral = Peripheral(self.__address, iface=1)
+        self.__peripheral = Peripheral(self.__address)
         self.__peripheral.setDelegate(self)
         characteristics = self.__peripheral.getCharacteristics()
         self.__ch = filter(lambda x: binascii.b2a_hex(x.uuid.binVal)
