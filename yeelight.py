@@ -44,13 +44,17 @@ class Yeelight(DefaultDelegate):
                 'B' # mode: 01=rgb 02=warm
                 'BBBx' # RGB
                 'B' # Brightness
-                'H' # warm 2byte 1700 ~ 6500
+                'H' # temp 2byte 1700 ~ 6500
                 'xxxxxxx'
             )
             (switch, mode, r, g, b,
-             brightness, warm) = struct.unpack(format, data)
-            print(switch, mode, r, g, b, brightness, warm)
-            print(binascii.b2a_hex(data))
+             brightness, temp) = struct.unpack(format, data)
+            if switch != 4:
+                self._switch = switch
+                self._mode = mode
+                self._rgb = '{:02x}{:02x}{:02x}'.format(r, g, b)
+                self._temp = temp
+                self._brightness = brightness
 
     def __connect(self):
         self.__peripheral = Peripheral(self.__address, iface=1)
@@ -72,6 +76,8 @@ class Yeelight(DefaultDelegate):
             self.AUTH_ON +
             self.COMMAND_ETX * 15)
 
+        self.update_status()
+
     def __write_cmd(self, value):
         for _ in range(3):
             try:
@@ -81,6 +87,26 @@ class Yeelight(DefaultDelegate):
                 self.__connect()
             else:
                 break
+
+    @property
+    def switch(self):
+        return self._switch
+
+    @property
+    def brightness(self):
+        return self._brightness
+
+    @property
+    def temp(self):
+        return self._temp
+
+    @property
+    def rgb(self):
+        return self._rgb
+
+    @property
+    def mode(self):
+        return self._mode
 
     def poweron(self):
         self.__write_cmd(
@@ -127,7 +153,7 @@ class Yeelight(DefaultDelegate):
             self.COMMAND_ETX * 14
         )
 
-    def get_status(self):
+    def update_status(self):
         self.__write_cmd(
             self.COMMAND_STX +
             self.STATUS_CMD +
