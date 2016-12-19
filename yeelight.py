@@ -122,7 +122,7 @@ class Yeelight(DefaultDelegate):
             self.POWER_OFF +
             self.COMMAND_ETX * 15)
 
-    def setrgb(self, rgb):
+    def set_rgb(self, rgb):
         self.__write_cmd(
             self.COMMAND_STX +
             self.COLOR_CMD +
@@ -130,22 +130,25 @@ class Yeelight(DefaultDelegate):
             self.RGB_MODE +
             self.COMMAND_ETX * 11)
 
-    def setbrightness(self, value):
+    def set_brightness(self, value):
         self.__write_cmd(
             self.COMMAND_STX +
             self.BRIGHT_CMD +
             ('%02x' % value) +
             self.COMMAND_ETX * 15)
 
-    def setwarm(self, value):
+    def set_temp(self, value):
+        if not 1700 <= value <= 6500 and 0.0 <= value <= 1.0:
+            value = 1700 + value * 4800
+
         self.__write_cmd(
             self.COMMAND_STX +
             self.COLORTEMP_CMD +
-            ('%04x' % (1700 + value * 4800)) +
+            ('%04x' % value) +
             self.TEMP_MODE +
             self.COMMAND_ETX * 13)
 
-    def setsleep(self, minute):
+    def set_sleep(self, minute):
         self.__write_cmd(
             self.COMMAND_STX +
             self.SLEEP_CMD +
