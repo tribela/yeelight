@@ -1,5 +1,6 @@
 import binascii
 import struct
+import time
 
 from bluepy.btle import BTLEException, DefaultDelegate, Peripheral
 class Yeelight(DefaultDelegate):
@@ -50,6 +51,7 @@ class Yeelight(DefaultDelegate):
             (switch, mode, r, g, b,
              brightness, temp) = struct.unpack(format, data)
             if switch != 4:
+                self._last_update = time.time()
                 self._switch = switch
                 self._mode = mode
                 self._rgb = '{:02x}{:02x}{:02x}'.format(r, g, b)
@@ -90,22 +92,27 @@ class Yeelight(DefaultDelegate):
 
     @property
     def switch(self):
+        self.update_status()
         return self._switch
 
     @property
     def brightness(self):
+        self.update_status()
         return self._brightness
 
     @property
     def temp(self):
+        self.update_status()
         return self._temp
 
     @property
     def rgb(self):
+        self.update_status()
         return self._rgb
 
     @property
     def mode(self):
+        self.update_status()
         return self._mode
 
     def poweron(self):
@@ -157,8 +164,11 @@ class Yeelight(DefaultDelegate):
         )
 
     def update_status(self):
-        self.__write_cmd(
-            self.COMMAND_STX +
-            self.STATUS_CMD +
-            self.COMMAND_ETX * 16
-        )
+        now = time.time()
+        last_update = getattr(self, '_last_update', None)
+        if not last_update or last_update + 1 < now:
+            self.__write_cmd(
+                self.COMMAND_STX +
+                self.STATUS_CMD +
+                self.COMMAND_ETX * 16
+            )
