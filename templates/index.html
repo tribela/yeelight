@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <script src="{{ url_for('bower.static', filename='angular/angular.min.js') }}" ></script>
+        <script type="text/javascript">
+            var ENTRIES = {{ {
+              'status': url_for('status'),
+              'switch': url_for('switch'),
+              'light': url_for('light'),
+            } | tojson | safe }};
+        </script>
+        <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+        <title>Yeelight</title>
+    </head>
+    <body ng-app="app" layout="column">
+      {% raw %}
+      <main ng-controller='lightCtrl'>
+          <section>
+              <label>Switch</switch>
+              <input type="checkbox" ng-model="status.switch"
+              ng-true-value="1" ng-false-value="2"
+              ng-change="changeSwitch()">
+          </section>
+          <section>
+              <label>Temp</label>
+              <input type="range" ng-model="status.temp"
+              ng-mouseup="changeTemp()"
+              min="1700" max="6500">
+              {{ status.temp }}
+          </section>
+          <section>
+              <label>RGB</label>
+              <input type="color" ng-model="status.rgb"
+              ng-change="changeRgb()">
+              {{ status.rgb }}
+          </section>
+          <section>
+              <label>brightness</label>
+              <input type="range" ng-model="status.brightness"
+              ng-mouseup="changeBrightness()"
+              >
+              {{ status.brightness }}
+          </section>
+      </main>
+      {% endraw %}
+    </body>
+</html>
+

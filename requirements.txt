@@ -1,0 +1,4 @@
+bluepy>=1.0.5
+Flask>=0.11.1
+Flask-bower>=1.2.1
+webcolors>=1.7

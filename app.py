@@ -4,10 +4,13 @@ import time
 import webcolors
 
 from flask import Flask, jsonify, render_template, request
+from flask_bower import Bower
 
 from yeelight import Yeelight
 
-app = Flask(__name__, template_folder='.')
+app = Flask(__name__)
+Bower(app)
+
 YEELIGHT_ADDRESS = os.environ['YEELIGHT_ADDRESS']
 yeelight = Yeelight(YEELIGHT_ADDRESS)
 

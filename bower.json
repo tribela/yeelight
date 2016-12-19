@@ -1,0 +1,24 @@
+{
+  "name": "yeelight",
+  "homepage": "https://github.com/kjwon15/yeelight",
+  "authors": [
+    "kjwon15 <kjwonmail@gmail.com>"
+  ],
+  "description": "Yeelight control panel",
+  "main": "",
+  "keywords": [
+    "Home-automation",
+    "Yeelight"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.6.0"
+  }
+}
