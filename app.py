@@ -3,7 +3,7 @@ import time
 
 import webcolors
 
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 
 from yeelight import Yeelight
 
@@ -15,6 +15,17 @@ yeelight = Yeelight(YEELIGHT_ADDRESS)
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/status')
+def status():
+    return jsonify(
+        switch=yeelight.switch,
+        mode=yeelight.mode,
+        brightness=yeelight.brightness,
+        rgb=yeelight.rgb,
+        temp=yeelight.temp,
+    )
 
 
 
