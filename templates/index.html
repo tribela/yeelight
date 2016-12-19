@@ -25,9 +25,16 @@
               ng-change="changeSwitch()">
           </section>
           <section>
+              <label>Mode</switch>
+              <input type="range" ng-model="status.mode"
+              min="1" max="2"
+              ng-change="changeMode()">
+          </section>
+          <section>
               <label>Temp</label>
               <input type="range" ng-model="status.temp"
-              ng-mouseup="changeTemp()"
+              ng-model-options="{ debounce: 1000 }"
+              ng-change="changeTemp()"
               min="1700" max="6500">
               {{ status.temp }}
           </section>
@@ -40,7 +47,9 @@
           <section>
               <label>brightness</label>
               <input type="range" ng-model="status.brightness"
-              ng-mouseup="changeBrightness()"
+              min="1" max="100"
+              ng-model-options="{ debounce: 1000 }"
+              ng-change="changeBrightness()"
               >
               {{ status.brightness }}
           </section>
