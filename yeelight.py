@@ -37,7 +37,6 @@ class Yeelight(DefaultDelegate):
     # Override
     def handleNotification(self, handle, data):
         if handle == 21:
-            val = binascii.b2a_hex(data)
             format = (
                 '!xx' # 4345 header
                 'B' # switch: 01=on 02=off
@@ -77,11 +76,7 @@ class Yeelight(DefaultDelegate):
             self.COMMAND_ETX * 15)
 
         # Get status
-        self.__write_cmd(
-            self.COMMAND_STX +
-            self.STATUS_CMD +
-            self.COMMAND_ETX * 16
-        )
+        self.__request_status()
 
     def __write_cmd(self, value):
         for _ in range(3):
@@ -92,6 +87,13 @@ class Yeelight(DefaultDelegate):
                 self.__connect()
             else:
                 break
+
+    def __request_status(self):
+        self.__write_cmd(
+            self.COMMAND_STX +
+            self.STATUS_CMD +
+            self.COMMAND_ETX * 16
+        )
 
     @property
     def switch(self):
@@ -146,6 +148,8 @@ class Yeelight(DefaultDelegate):
             self.BRIGHT_CMD +
             ('%02x' % value) +
             self.COMMAND_ETX * 15)
+        # Bypass bug
+        self.__request_status()
 
     def set_temp(self, value):
         if not 1700 <= value <= 6500 and 0.0 <= value <= 1.0:
