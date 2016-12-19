@@ -31,7 +31,9 @@ def status():
 
 @app.route('/switch', methods=['POST'])
 def switch():
-    switch = request.form.get('switch')
+    data = request.json or request.form
+
+    switch = data.get('switch')
     command = {
         'on': yeelight.poweron,
         'off': yeelight.poweroff,
@@ -46,11 +48,12 @@ def switch():
 
 @app.route('/light', methods=['POST'])
 def light():
-    brightness = request.form.get('brightness')
-    rgb = request.form.get('rgb')
-    color = request.form.get('color')
-    temp = request.form.get('temp')
+    data = request.json or request.form
 
+    brightness = data.get('brightness')
+    rgb = data.get('rgb')
+    color = data.get('color')
+    temp = data.get('temp')
 
     if brightness:
         print('Set brightness: {}'.format(brightness))
@@ -78,7 +81,8 @@ def light():
 
 @app.route('/sleep', methods=['POST'])
 def sleep():
-    minutes = int(request.form.get('minutes'))
+    data = request.json or request.form
+    minutes = int(data.get('minutes'))
     yeelight.set_sleep(minutes)
     print('Set sleep: {}'.format(minutes))
     return 'OK'
