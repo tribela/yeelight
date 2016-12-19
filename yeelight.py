@@ -1,8 +1,8 @@
 import binascii
-from bluepy.btle import BTLEException, Peripheral
+import struct
 
-
-class Yeelight(object):
+from bluepy.btle import BTLEException, DefaultDelegate, Peripheral
+class Yeelight(DefaultDelegate):
     WRITE_CHAR_UUID = "aa7d3f34"  # -2d4f-41e0-807f-52fbf8cf7443"
 
     COMMAND_STX = "43"
@@ -23,22 +23,49 @@ class Yeelight(object):
     COLORTEMP_CMD = "43"
     TEMP_MODE = "65"
 
+    STATUS_CMD = "44"
+
     COLORFLOW_CMD = "4a"
 
     SLEEP_CMD = "7f03"
 
     def __init__(self, address):
+        DefaultDelegate.__init__(self)
         self.__address = address
         self.__connect()
 
+    # Override
+    def handleNotification(self, handle, data):
+        if handle == 21:
+            val = binascii.b2a_hex(data)
+            format = (
+                '!xx' # 4345 header
+                'B' # switch: 01=on 02=off
+                'B' # mode: 01=rgb 02=warm
+                'BBBx' # RGB
+                'B' # Brightness
+                'H' # warm 2byte 1700 ~ 6500
+                'xxxxxxx'
+            )
+            (switch, mode, r, g, b,
+             brightness, warm) = struct.unpack(format, data)
+            print(switch, mode, r, g, b, brightness, warm)
+            print(binascii.b2a_hex(data))
 
     def __connect(self):
-        self.__peripheral = Peripheral(self.__address)
+        self.__peripheral = Peripheral(self.__address, iface=1)
+        self.__peripheral.setDelegate(self)
         characteristics = self.__peripheral.getCharacteristics()
         self.__ch = filter(lambda x: binascii.b2a_hex(x.uuid.binVal)
                            .startswith(self.WRITE_CHAR_UUID),
                            characteristics)[0]
 
+        # Register notification
+        self.__peripheral.writeCharacteristic(
+            0x16,
+            binascii.a2b_hex('0100'))
+
+        # Auth
         self.__write_cmd(
             self.COMMAND_STX +
             self.AUTH_CMD +
@@ -49,6 +76,7 @@ class Yeelight(object):
         for _ in range(3):
             try:
                 self.__ch.write(binascii.a2b_hex(value))
+                self.__peripheral.waitForNotifications(1.0)
             except BTLEException:
                 self.__connect()
             else:
@@ -97,4 +125,11 @@ class Yeelight(object):
             self.SLEEP_CMD +
             ('%02x' % minute) +
             self.COMMAND_ETX * 14
+        )
+
+    def get_status(self):
+        self.__write_cmd(
+            self.COMMAND_STX +
+            self.STATUS_CMD +
+            self.COMMAND_ETX * 16
         )

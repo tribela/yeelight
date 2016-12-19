@@ -44,7 +44,6 @@ def light():
     if brightness:
         print('Set brightness: {}'.format(brightness))
         yeelight.setbrightness(int(brightness))
-        time.sleep(0.3)
 
     if rgb:
         print('Set rgb: {}'.format(rgb))
