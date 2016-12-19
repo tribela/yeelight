@@ -1,6 +1,5 @@
 import binascii
 import struct
-import time
 
 from bluepy.btle import BTLEException, DefaultDelegate, Peripheral
 class Yeelight(DefaultDelegate):
@@ -51,7 +50,6 @@ class Yeelight(DefaultDelegate):
             (switch, mode, r, g, b,
              brightness, temp) = struct.unpack(format, data)
             if switch != 4:
-                self._last_update = time.time()
                 self._switch = switch
                 self._mode = mode
                 self._rgb = '{:02x}{:02x}{:02x}'.format(r, g, b)
@@ -78,7 +76,12 @@ class Yeelight(DefaultDelegate):
             self.AUTH_ON +
             self.COMMAND_ETX * 15)
 
-        self.update_status()
+        # Get status
+        self.__write_cmd(
+            self.COMMAND_STX +
+            self.STATUS_CMD +
+            self.COMMAND_ETX * 16
+        )
 
     def __write_cmd(self, value):
         for _ in range(3):
@@ -164,11 +167,4 @@ class Yeelight(DefaultDelegate):
         )
 
     def update_status(self):
-        now = time.time()
-        last_update = getattr(self, '_last_update', None)
-        if not last_update or last_update + 1 < now:
-            self.__write_cmd(
-                self.COMMAND_STX +
-                self.STATUS_CMD +
-                self.COMMAND_ETX * 16
-            )
+        self.__peripheral.waitForNotifications(0.01)
