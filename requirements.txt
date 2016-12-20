@@ -1,4 +1,7 @@
-bluepy>=1.0.5
+Flask-Bower>=1.2.1
+Flask-SSE>=0.2.1
 Flask>=0.11.1
-Flask-bower>=1.2.1
+bluepy>=1.0.5
+gevent>=1.1.2
+uWSGI>=2.0.14
 webcolors>=1.7

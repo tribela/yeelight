@@ -5,14 +5,27 @@ import webcolors
 
 from flask import Flask, jsonify, render_template, request
 from flask_bower import Bower
+from flask_sse import sse
 
 from yeelight import Yeelight
 
 app = Flask(__name__)
 Bower(app)
+app.config['REDIS_URL'] = os.getenv('REDIS_URL')
+app.register_blueprint(sse, url_prefix='/stream')
 
 YEELIGHT_ADDRESS = os.environ['YEELIGHT_ADDRESS']
 yeelight = Yeelight(YEELIGHT_ADDRESS)
+
+
+def get_status():
+    return {
+        'switch': yeelight.switch,
+        'mode': yeelight.mode,
+        'brightness': yeelight.brightness,
+        'rgb': yeelight.rgb,
+        'temp': yeelight.temp,
+    }
 
 
 @app.route('/')
@@ -22,13 +35,7 @@ def index():
 
 @app.route('/status')
 def status():
-    return jsonify(
-        switch=yeelight.switch,
-        mode=yeelight.mode,
-        brightness=yeelight.brightness,
-        rgb=yeelight.rgb,
-        temp=yeelight.temp,
-    )
+    return jsonify(get_status())
 
 
 
@@ -45,6 +52,8 @@ def switch():
         command[switch]()
         print('Turn {} the light'.format(switch))
         return 'OK'
+
+    sse.publish(get_status(), type='update')
 
     return 'Fail'
 
@@ -78,6 +87,7 @@ def light():
         print('Set temp: {}'.format(temp))
         yeelight.set_temp(float(temp))
 
+    sse.publish(get_status(), type='update')
 
     return 'OK' if any((brightness, rgb, temp)) else 'FAIL'
 
@@ -88,4 +98,5 @@ def sleep():
     minutes = int(data.get('minutes'))
     yeelight.set_sleep(minutes)
     print('Set sleep: {}'.format(minutes))
+    sse.publish(get_status(), type='update')
     return 'OK'

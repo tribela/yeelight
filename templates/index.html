@@ -10,6 +10,7 @@
               'status': url_for('status'),
               'switch': url_for('switch'),
               'light': url_for('light'),
+              'stream': url_for('sse.stream'),
             } | tojson | safe }};
         </script>
         <script src="{{ url_for('static', filename='js/app.js') }}"></script>
@@ -29,6 +30,7 @@
               <input type="range" ng-model="status.mode"
               min="1" max="2"
               ng-change="changeMode()">
+              {{ status.mode }}
           </section>
           <section>
               <label>Temp</label>
