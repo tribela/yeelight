@@ -15,7 +15,11 @@ app.config['REDIS_URL'] = os.getenv('REDIS_URL')
 app.register_blueprint(sse, url_prefix='/stream')
 
 YEELIGHT_ADDRESS = os.environ['YEELIGHT_ADDRESS']
-yeelight = Yeelight(YEELIGHT_ADDRESS)
+
+@app.before_first_request
+def connect_yeelight():
+    global yeelight
+    yeelight = Yeelight(YEELIGHT_ADDRESS)
 
 
 def get_status():
