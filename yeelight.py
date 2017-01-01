@@ -153,7 +153,7 @@ class Yeelight(DefaultDelegate):
 
     def set_temp(self, value):
         if not 1700 <= value <= 6500 and 0.0 <= value <= 1.0:
-            value = 1700 + value * 4800
+            value = int(1700 + value * 4800)
 
         self.__write_cmd(
             self.COMMAND_STX +

@@ -85,7 +85,7 @@ def light():
             yeelight.set_rgb(rgb)
     elif temp:
         print('Set temp: {}'.format(temp))
-        yeelight.set_temp(float(temp))
+        yeelight.set_temp(temp)
 
     sse.publish(get_status(), type='update')
 
