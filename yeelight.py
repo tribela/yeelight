@@ -3,7 +3,7 @@ import struct
 
 from bluepy.btle import BTLEException, DefaultDelegate, Peripheral
 class Yeelight(DefaultDelegate):
-    WRITE_CHAR_UUID = "aa7d3f34"  # -2d4f-41e0-807f-52fbf8cf7443"
+    WRITE_CHAR_UUID = b"aa7d3f34"  # -2d4f-41e0-807f-52fbf8cf7443"
 
     COMMAND_STX = "43"
     COMMAND_ETX = "00"
@@ -59,9 +59,9 @@ class Yeelight(DefaultDelegate):
         self.__peripheral = Peripheral(self.__address)
         self.__peripheral.setDelegate(self)
         characteristics = self.__peripheral.getCharacteristics()
-        self.__ch = filter(lambda x: binascii.b2a_hex(x.uuid.binVal)
+        self.__ch = next(iter(filter(lambda x: binascii.b2a_hex(x.uuid.binVal)
                            .startswith(self.WRITE_CHAR_UUID),
-                           characteristics)[0]
+                           characteristics)))
 
         # Register notification
         self.__peripheral.writeCharacteristic(
