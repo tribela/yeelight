@@ -88,6 +88,7 @@ def light():
         else:
             yeelight.set_rgb(rgb)
     elif temp:
+        temp = int(temp)
         print('Set temp: {}'.format(temp))
         yeelight.set_temp(temp)
 
