@@ -43,11 +43,20 @@ def status():
 
 
 
-@app.route('/switch', methods=['POST'])
+@app.route('/switch', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def switch():
-    data = request.json or request.form
+    if request.method == 'GET':
+        return '1' if yeelight.switch == 1 else '0'
 
-    switch = data.get('switch')
+    if request.method == 'POST':
+        data = request.json or request.form
+        switch = data.get('switch')
+    elif request.method in ('PUT', 'DELETE'):
+        if request.method == 'PUT':
+            switch = 'on'
+        else:
+            switch = 'off'
+
     command = {
         'on': yeelight.poweron,
         'off': yeelight.poweroff,
