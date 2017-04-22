@@ -64,9 +64,8 @@ def switch():
     if switch in command:
         command[switch]()
         print('Turn {} the light'.format(switch))
+        sse.publish(get_status(), type='update')
         return 'OK'
-
-    sse.publish(get_status(), type='update')
 
     return 'Fail'
 
