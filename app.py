@@ -60,6 +60,8 @@ def switch():
     command = {
         'on': yeelight.poweron,
         'off': yeelight.poweroff,
+        '1': yeelight.poweron,
+        '0': yeelight.poweroff,
     }
     if switch in command:
         command[switch]()
