@@ -82,8 +82,22 @@ def switch():
     return 'Fail'
 
 
-@app.route('/light', methods=['POST'])
+@app.route('/light', methods=['GET', 'PUT', 'DELETE'])
 def light():
+    if request.method == 'GET':
+        return jsonify(get_status())
+    elif request.method == 'PUT':
+        yeelight.poweron()
+        sse.publish(get_status(), type='update')
+    elif request.method == 'DELETE':
+        yeelight.poweroff()
+        sse.publish(get_status(), type='update')
+
+    return 'OK'
+
+
+@app.route('/light', methods=['POST'])
+def light_set():
     data = request.json or request.form
 
     brightness = data.get('brightness')

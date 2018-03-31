@@ -9,7 +9,7 @@
             var ENTRIES = {{ {
               'status': url_for('status'),
               'switch': url_for('switch'),
-              'light': url_for('light'),
+              'light': url_for('light_set'),
               'stream': url_for('sse.stream'),
             } | tojson | safe }};
         </script>
