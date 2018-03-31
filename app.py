@@ -22,6 +22,17 @@ def connect_yeelight():
     yeelight = Yeelight(YEELIGHT_ADDRESS)
 
 
+@app.before_request
+def check_alive():
+    try:
+        yeelight.update_status()
+    except:
+        yeelight.disconnect()
+        connect_yeelight()
+        # This stops gunicorn
+        # os._exit(4)
+
+
 def get_status():
     return {
         'switch': yeelight.switch,
@@ -40,7 +51,6 @@ def index():
 @app.route('/status')
 def status():
     return jsonify(get_status())
-
 
 
 @app.route('/switch', methods=['GET', 'POST', 'PUT', 'DELETE'])

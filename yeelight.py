@@ -55,6 +55,9 @@ class Yeelight(DefaultDelegate):
                 self._temp = temp
                 self._brightness = brightness
 
+    def disconnect(self, *args, **kwargs):
+        return self.__peripheral.disconnect(*args, **kwargs)
+
     def __connect(self):
         self.__peripheral = Peripheral(self.__address)
         self.__peripheral.setDelegate(self)
@@ -83,10 +86,13 @@ class Yeelight(DefaultDelegate):
             try:
                 self.__ch.write(binascii.a2b_hex(value))
                 self.__peripheral.waitForNotifications(1.0)
-            except BTLEException:
+            except BTLEException as e:
+                error = e
                 self.__connect()
             else:
                 break
+        else:
+            raise error
 
     def __request_status(self):
         self.__write_cmd(
