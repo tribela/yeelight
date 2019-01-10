@@ -1,20 +1,18 @@
 import os
-import time
 
 import webcolors
 
 from flask import Flask, jsonify, render_template, request
-from flask_bower import Bower
 from flask_sse import sse
 
 from yeelight import Yeelight
 
 app = Flask(__name__)
-Bower(app)
 app.config['REDIS_URL'] = os.getenv('REDIS_URL')
 app.register_blueprint(sse, url_prefix='/stream')
 
 YEELIGHT_ADDRESS = os.environ['YEELIGHT_ADDRESS']
+
 
 @app.before_first_request
 def connect_yeelight():
