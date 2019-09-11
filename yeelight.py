@@ -85,11 +85,16 @@ class Yeelight(DefaultDelegate):
         for _ in range(3):
             try:
                 self.__ch.write(binascii.a2b_hex(value))
-                self.__peripheral.waitForNotifications(1.0)
             except BTLEException as e:
                 error = e
                 self.__connect()
             else:
+                self.__ch.write(binascii.a2b_hex(
+                    self.COMMAND_STX +
+                    self.STATUS_CMD +
+                    self.COMMAND_ETX * 16
+                ))
+                self.__peripheral.waitForNotifications(1.0)
                 break
         else:
             raise error
@@ -154,8 +159,6 @@ class Yeelight(DefaultDelegate):
             self.BRIGHT_CMD +
             ('%02x' % value) +
             self.COMMAND_ETX * 15)
-        # Bypass bug
-        self.__request_status()
 
     def set_temp(self, value):
         if not 1700 <= value <= 6500 and 0.0 <= value <= 1.0:
@@ -176,5 +179,5 @@ class Yeelight(DefaultDelegate):
             self.COMMAND_ETX * 14
         )
 
-    def update_status(self):
-        self.__peripheral.waitForNotifications(0.01)
+    def update_status(self, timeout=0.1):
+        self.__peripheral.waitForNotifications(timeout)
